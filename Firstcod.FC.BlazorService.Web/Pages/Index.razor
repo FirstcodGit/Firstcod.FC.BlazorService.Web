@@ -1,0 +1,72 @@
+﻿@page "/"
+@inject IJSRuntime _JsRuntime
+@inject ToastrComponent Notify
+@inject ServiceComponent Services
+
+<div class="card">
+    <div class="card-header">
+        Home
+    </div>
+    <div class="card-body">
+
+        <p class="blockquote-footer" id="time"></p>
+
+        <blockquote class="blockquote mb-0">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+            <footer class="blockquote-footer">Someone famous in <cite title="Source Title">Source Title</cite></footer>
+        </blockquote>
+        
+        <div class="mt-4">
+            <button class="btn btn-info" @onclick="@(() => CreateToken())">Create Token</button>
+            <button class="btn btn-primary" @onclick="@(() => PostMethod())">Post Api</button>
+        </div>
+
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Bearer { get; set; }
+
+    private void CreateToken()
+    {
+        string value = Guid.NewGuid().ToString();
+
+        var response = Services.ResponseJson("http://localhost:52675/api/transaction", null, null, null, RestSharp.Method.GET);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            var json = JsonConvert.DeserializeObject<Dictionary<string, string>>(response.Content)["token"].ToString();
+
+            Bearer = json;
+            Notify.ShowToast(ToastType.Success.ToString(), "Token", Bearer.ToString()).GetAwaiter();
+        }
+        else
+            Notify.ShowToast(ToastType.Error.ToString(), "Web Api Post", response.StatusCode.ToString()).GetAwaiter();
+    }
+
+    private void PostMethod()
+    {
+        Dictionary<string, string> header = new Dictionary<string, string>();
+        header.Add("Authorization", "Bearer " + Bearer);
+
+        string value = Guid.NewGuid().ToString();
+
+        var response = Services.ResponseJsonAuth("http://localhost:52675/api/transaction", value, header, RestSharp.Method.POST);
+
+        if (response.StatusCode == System.Net.HttpStatusCode.OK)
+        {
+            Notify.ShowToast(ToastType.Success.ToString(), "Web Api Post", response.StatusCode.ToString()).GetAwaiter();
+        }
+        else
+            Notify.ShowToast(ToastType.Error.ToString(), "Web Api Post", response.StatusCode.ToString()).GetAwaiter();
+    }
+
+    protected override void OnInitialized()
+    {
+        Notify.ShowToast(ToastType.Warning.ToString(), "Home", "Home page").GetAwaiter();
+
+        _JsRuntime.InvokeVoidAsync("timer").GetAwaiter();
+    }
+}

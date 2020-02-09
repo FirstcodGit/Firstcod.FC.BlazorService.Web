@@ -1,0 +1,26 @@
+﻿@page "/"
+@namespace Firstcod.FC.BlazorService.Web
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Firstcod</title>
+    <link href="~/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/toastr/toastr.min.css" rel="stylesheet" />
+    <link href="~/site.css" rel="stylesheet" />
+</head>
+<body>
+
+    <app>
+        @(await Html.RenderComponentAsync<App>(RenderMode.ServerPrerendered))
+    </app>
+
+    <script src="_framework/blazor.server.js"></script>
+    <script src="~/jquery/jquery.min.js"></script>
+    <script src="~/bootstrap/bootstrap.min.js"></script>
+    <script src="~/toastr/toastr.min.js"></script>
+    <script src="~/scripts.js"></script>
+
+</body>
+</html>
